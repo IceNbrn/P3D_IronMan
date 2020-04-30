@@ -35,7 +35,7 @@ namespace scene
 
 		glm::mat4 m_Proj, m_View, m_Model;
 		glm::vec2 m_ScreenSize;
-		glm::vec3 m_Rotate;
+		float m_Rotate;
 		float m_RotationValue;
 	};
 }

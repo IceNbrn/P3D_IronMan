@@ -49,10 +49,17 @@ namespace scene
 			 0.5f,  0.5f, -0.5f, 0.0f, 1.0f, // c 14
 			 0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // b 15
 			// Bottom Face
-			 0.5f,  -0.5f, -0.5f, 1.0f, 1.0f,
-			 0.5f,  -0.5f, 0.5f, 1.0f, 0.0f,
-			-0.5f,  -0.5f, 0.5f, 0.0f, 0.0f,
-			-0.5f,  -0.5f, -0.5f, 0.0f, 1.0f,
+			 0.5f,  -0.5f, -0.5f, 1.0f, 1.0f, // 16
+			 0.5f,  -0.5f, 0.5f, 1.0f, 0.0f, // 17
+			-0.5f,  -0.5f, 0.5f, 0.0f, 0.0f, // 18
+			-0.5f,  -0.5f, -0.5f, 0.0f, 1.0f, //19
+			// Left Face
+			-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // 20
+			-0.5f, -0.5f, 0.5f, 1.0f, 0.0f, // 21
+			-0.5f, 0.5f, 0.5, 1.0f, 1.0f, // 22
+			-0.5f, 0.5f, -0.5, 0.0f, 1.0f, //23
+			
+			
 		};
 		unsigned int indices[] = {
 			// Back Face
@@ -70,6 +77,9 @@ namespace scene
 			// Bottom Face
 			16, 19, 18,
 			18, 17, 16,
+			// Left Face
+			20, 21, 22,
+			22, 23, 20
 		};
 		GLCall(glEnable(GL_DEPTH_TEST));
 		GLCall(glEnable(GL_BLEND));
@@ -78,13 +88,13 @@ namespace scene
 		//Vertex array object
 		m_VAO = std::make_unique<VertexArray>();
 
-		m_VertexBuffer = std::make_unique<VertexBuffer>(positions, 20 * 5 * sizeof(float));
+		m_VertexBuffer = std::make_unique<VertexBuffer>(positions, 24 * 5 * sizeof(float));
 		VertexBufferLayout layout;
 		layout.Push<float>(3);
 		layout.Push<float>(2);
 
 		m_VAO->AddBuffer(*m_VertexBuffer, layout);
-		m_IndexBuffer = std::make_unique<IndexBuffer>(indices, 30);
+		m_IndexBuffer = std::make_unique<IndexBuffer>(indices, 36);
 
 		m_Shader = std::make_unique<Shader>("res/shaders/3dTest.vs", "res/shaders/3dTest.fs");
 		m_Shader->Bind();
@@ -140,7 +150,7 @@ namespace scene
 		//m_Model = glm::rotate(m_Model, (float)glfwGetTime() * glm::radians(2.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		//m_Model = glm::rotate(m_Model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
-		m_Model = glm::rotate(glm::mat4(1.0f), glm::radians(2.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		m_Model = glm::rotate(glm::mat4(1.0f), glm::radians(m_Rotate), glm::vec3(0.0f, 1.0f, 0.0f));
 
 		m_Shader->Bind();
 		m_Shader->SetUniformMat4f("u_Projection", m_Proj);
@@ -152,7 +162,7 @@ namespace scene
 	void Scene3D::OnImGuiRender()
 	{
 		ImGui::Text("Rotation Value: %.3f", m_RotationValue);
-		ImGui::SliderFloat3("Rotate", &m_Rotate.x, -360.0f, 360);
+		ImGui::SliderFloat("Rotate", &m_Rotate, -360.0f, 360);
 		ImGui::SetNextWindowSize(ImVec2(0, 0), ImGuiCond_FirstUseEver);
 		ImGui::Begin("Stats");
 		ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
