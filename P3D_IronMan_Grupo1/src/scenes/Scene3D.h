@@ -37,5 +37,6 @@ namespace scene
 		glm::vec2 m_ScreenSize;
 		float m_Rotate;
 		float m_RotationValue;
+		float m_Radius;
 	};
 }

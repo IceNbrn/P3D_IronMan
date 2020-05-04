@@ -26,6 +26,8 @@ namespace scene
 		m_View = glm::translate(m_View, glm::vec3(0.0f, 0.0f, -3.0f));
 		m_Proj = glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
 
+		m_Radius = 10.0f;
+
 		float positions[] = {
 			// positions		// texture coords
 			// Back Face
@@ -58,7 +60,6 @@ namespace scene
 			-0.5f, -0.5f, 0.5f, 1.0f, 0.0f, // 21
 			-0.5f, 0.5f, 0.5, 1.0f, 1.0f, // 22
 			-0.5f, 0.5f, -0.5, 0.0f, 1.0f, //23
-			
 			
 		};
 		unsigned int indices[] = {
@@ -133,30 +134,42 @@ namespace scene
 		}
 
 		//m_RotationValue = atan2(sinYaw, cosYaw) * 180 / M_PI;
-		
 		//m_RotationValue = atan2(sinPitch, cosPitch) * 180 / M_PI;
 		m_RotationValue = atan2(sinRoll, cosRoll) * 180 / M_PI;
+
+		float camX = sin(glfwGetTime()) * m_Radius;
+		float camZ = cos(glfwGetTime()) * m_Radius;
+		m_View = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//m_Model = glm::rotate(glm::mat4(1.0f), glm::radians(m_Rotate), glm::vec3(0.0f, 1.0f, 0.0f));
+		//m_Model = glm::rotate(m_Model, glm::radians(2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		
 	}
 
 	void Scene3D::OnRender()
 	{
-
-		GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
+		GLCall(glClearColor(0.116f, 0.171f, 0.242f, 1.0f));
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
 		Renderer renderer;
 		m_Texture->Bind();
-
-		//m_Model = glm::rotate(m_Model, (float)glfwGetTime() * glm::radians(2.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		//m_Model = glm::rotate(m_Model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-
-		m_Model = glm::rotate(glm::mat4(1.0f), glm::radians(m_Rotate), glm::vec3(0.0f, 1.0f, 0.0f));
-
-		m_Shader->Bind();
+		
 		m_Shader->SetUniformMat4f("u_Projection", m_Proj);
 		m_Shader->SetUniformMat4f("u_View", m_View);
-		m_Shader->SetUniformMat4f("u_Model", m_Model);
-		renderer.Draw(*m_VAO, *m_IndexBuffer, *m_Shader);
+		
+		{
+			m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+			m_Shader->Bind();
+			m_Shader->SetUniformMat4f("u_Model", m_Model);
+			renderer.Draw(*m_VAO, *m_IndexBuffer, *m_Shader);
+		}
+
+		{
+			m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f, 2.0f, 3.0f));
+			m_Shader->Bind();
+			m_Shader->SetUniformMat4f("u_Model", m_Model);
+			renderer.Draw(*m_VAO, *m_IndexBuffer, *m_Shader);
+		}
+		
 	}
 
 	void Scene3D::OnImGuiRender()
