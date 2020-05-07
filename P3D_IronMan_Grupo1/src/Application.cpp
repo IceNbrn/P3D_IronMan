@@ -22,6 +22,13 @@
 #include "scenes/SceneTexture.h"
 #include "scenes/Scene3D.h"
 
+#define SCR_WIDTH 1280
+#define SCR_HEIGHT 720
+
+Camera camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
+bool firstMouse = true;
+float lastX, lastY;
+
 void ProcessInput(GLFWwindow* window, bool* isMyToolActive)
 {
 	//TODO: this function needs refactoring
@@ -33,11 +40,50 @@ void ProcessInput(GLFWwindow* window, bool* isMyToolActive)
         glfwTerminate();
         exit(0);
 	}
+	if(glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
+
+void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
+{
+	glViewport(0, 0, width, height);
+}
+
+void MouseCallback(GLFWwindow* window, double xpos, double ypos)
+{
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+	lastX = xpos;
+	lastY = ypos;
+
+	camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
+// glfw: whenever the mouse scroll wheel scrolls, this callback is called
+// ----------------------------------------------------------------------
+void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	camera.ProcessMouseScroll(yoffset);
 }
 
 int main(void)
 {
     GLFWwindow* window;
+
+	firstMouse = true;
+	lastX = SCR_WIDTH / 2.0f;
+	lastY = SCR_HEIGHT / 2.0f;
+	camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
     
     /* Initialize the library */
     if (!glfwInit())
@@ -55,7 +101,7 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(1280, 720, "IPCA - P3D | Grupo 1 | IronMan", NULL, NULL);
+    window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "IPCA - P3D | Grupo 1 | IronMan", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -64,7 +110,10 @@ int main(void)
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
-
+	glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
+	glfwSetCursorPosCallback(window, MouseCallback);
+	glfwSetScrollCallback(window, ScrollCallback);
+	
     //Sync with vsync
     glfwSwapInterval(1);
 
@@ -89,7 +138,7 @@ int main(void)
 
 		sceneMenu->RegisterScene<scene::SceneClearColor>("Clear Color");
 		sceneMenu->RegisterScene<scene::SceneTexture2D, GLFWwindow*>("2D Texture", window);
-		sceneMenu->RegisterScene<scene::Scene3D, GLFWwindow*>("3D", window);
+		sceneMenu->RegisterScene<scene::Scene3D, GLFWwindow*, Camera*>("3D", window, &camera);
 
 
 		while (!glfwWindowShouldClose(window))
@@ -111,7 +160,7 @@ int main(void)
 			{
 				currentScene->OnUpdate(deltaTime);
 				currentScene->OnRender();
-				ImGui::Begin("Test", &isMyToolActive, ImGuiWindowFlags_MenuBar);
+				ImGui::Begin("Scenes", &isMyToolActive, ImGuiWindowFlags_MenuBar);
 				if (ImGui::BeginMenuBar())
 				{
 					if (ImGui::BeginMenu("File"))

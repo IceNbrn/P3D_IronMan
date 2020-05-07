@@ -10,6 +10,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 #include <GLFW/glfw3.h>
+#include "Camera.h"
 
 class Shader;
 
@@ -18,13 +19,13 @@ namespace scene
 	class Scene3D : public Scene
 	{
 	public:
-		Scene3D(GLFWwindow* window);
+		Scene3D(GLFWwindow* window, Camera* camera);
 		~Scene3D();
 
 		void OnUpdate(float deltaTime) override;
 		void OnRender() override;
 		void OnImGuiRender() override;
-
+		
 	private:
 		GLFWwindow* m_Window;
 		std::unique_ptr<VertexArray> m_VAO;
@@ -38,5 +39,18 @@ namespace scene
 		float m_Rotate;
 		float m_RotationValue;
 		float m_Radius;
+
+		float m_Fov;
+		float m_NearPlane;
+		float m_FarPlane;
+		float m_AspectRatio;
+
+		glm::vec3 m_CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+		glm::vec3 m_CameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+		glm::vec3 m_CameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+		float m_CameraSpeed;
+		Camera* m_Camera;
+
+		void ProcessInput(GLFWwindow* window, float dt);
 	};
 }

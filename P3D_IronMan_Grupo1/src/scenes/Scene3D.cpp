@@ -8,25 +8,33 @@
 
 namespace scene
 {
-	Scene3D::Scene3D(GLFWwindow* window)
-	{
+	Scene3D::Scene3D(GLFWwindow* window, Camera* camera)
+	{		
+		m_Window = window;
 		int width, height;
 		glfwGetWindowSize(window, &width, &height);
 
-		float fov = 60.0f;
-		float nearPlane = 0.1f;
-		float farPlane = 100.0f;
-		float aspectRatio = (float)width / (float)height;
+		m_Fov = 60.0f;
+		m_NearPlane = 0.1f;
+		m_FarPlane = 100.0f;
+		m_AspectRatio = (float)width / (float)height;
 
+		m_Camera = camera;
+		
 		m_Model = glm::mat4(1.0f);
 		m_View = glm::mat4(1.0f);
 		m_Proj = glm::mat4(1.0f);
 
 		m_Model = glm::rotate(m_Model, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		m_View = glm::translate(m_View, glm::vec3(0.0f, 0.0f, -3.0f));
-		m_Proj = glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
-
+		//m_View = glm::translate(m_View, glm::vec3(0.0f, 0.0f, -3.0f));
+		//m_View = glm::lookAt(m_CameraPos, m_CameraPos + m_CameraFront, m_CameraUp);
+		//m_Proj = glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
+		m_Proj = glm::perspective(glm::radians(m_Camera->Zoom), m_AspectRatio, m_NearPlane, m_FarPlane);
+		m_View = m_Camera->GetViewMatrix();
+		m_CameraSpeed = 2.5f;
+		
 		m_Radius = 10.0f;
+		
 
 		float positions[] = {
 			// positions		// texture coords
@@ -85,7 +93,7 @@ namespace scene
 		GLCall(glEnable(GL_DEPTH_TEST));
 		GLCall(glEnable(GL_BLEND));
 		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-
+		
 		//Vertex array object
 		m_VAO = std::make_unique<VertexArray>();
 
@@ -109,40 +117,18 @@ namespace scene
 		m_Texture->Unbind();
 		m_Shader->Unbind();
 		GLCall(glDisable(GL_DEPTH_TEST));
+		glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 
 	void Scene3D::OnUpdate(float deltaTime)
 	{
-		double sinPitch, cosPitch, sinRoll, cosRoll, sinYaw, cosYaw;
+		ProcessInput(m_Window, deltaTime);
 
-		sinPitch = -m_Model[2][0];
-		cosPitch = sqrt(1 - sinPitch * sinPitch);
-
-		if (abs(cosPitch) > DBL_EPSILON)
-		{
-			sinRoll = m_Model[2][1] / cosPitch;
-			cosRoll = m_Model[2][2] / cosPitch;
-			sinYaw = m_Model[1][0] / cosPitch;
-			cosYaw = m_Model[0][0] / cosPitch;
-		}
-		else
-		{
-			sinRoll = -m_Model[1][2];
-			cosRoll = m_Model[1][1];
-			sinYaw = 0;
-			cosYaw = 1;
-		}
-
-		//m_RotationValue = atan2(sinYaw, cosYaw) * 180 / M_PI;
-		//m_RotationValue = atan2(sinPitch, cosPitch) * 180 / M_PI;
-		m_RotationValue = atan2(sinRoll, cosRoll) * 180 / M_PI;
-
-		float camX = sin(glfwGetTime()) * m_Radius;
-		float camZ = cos(glfwGetTime()) * m_Radius;
-		m_View = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//m_View = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		//m_Model = glm::rotate(glm::mat4(1.0f), glm::radians(m_Rotate), glm::vec3(0.0f, 1.0f, 0.0f));
 		//m_Model = glm::rotate(m_Model, glm::radians(2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		
+		m_View = m_Camera->GetViewMatrix();
+		m_Proj = glm::perspective(glm::radians(m_Camera->Zoom), m_AspectRatio, m_NearPlane, m_FarPlane);
 	}
 
 	void Scene3D::OnRender()
@@ -168,7 +154,7 @@ namespace scene
 			m_Shader->Bind();
 			m_Shader->SetUniformMat4f("u_Model", m_Model);
 			renderer.Draw(*m_VAO, *m_IndexBuffer, *m_Shader);
-		}
+		} 
 		
 	}
 
@@ -176,11 +162,34 @@ namespace scene
 	{
 		ImGui::Text("Rotation Value: %.3f", m_RotationValue);
 		ImGui::SliderFloat("Rotate", &m_Rotate, -360.0f, 360);
+		ImGui::SliderFloat("Camera Speed", m_Camera->GetMovementSpeed(), 0.0f, 15.0f);
+		ImGui::SliderFloat("Camera Zoom", &m_Camera->Zoom, 0.0f, 60.0f);
+		
 		ImGui::SetNextWindowSize(ImVec2(0, 0), ImGuiCond_FirstUseEver);
 		ImGui::Begin("Stats");
 		ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 		ImGui::Text("Application average %.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();
+	}
+	/*
+	void Scene3D::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+	{
+		std::cout << "Y: " << yoffset << std::endl;
+		m_Camera.ProcessMouseScroll(yoffset);
+	}*/
+
+	void Scene3D::ProcessInput(GLFWwindow* window, float dt)
+	{
+		float cameraSpeed = m_CameraSpeed * dt;
+
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+			m_Camera->ProcessKeyboard(FORWARD, dt);
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+			m_Camera->ProcessKeyboard(BACKWARD, dt);
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+			m_Camera->ProcessKeyboard(LEFT, dt);
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+			m_Camera->ProcessKeyboard(RIGHT, dt);
 	}
 
 }
