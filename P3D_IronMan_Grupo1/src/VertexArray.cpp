@@ -3,6 +3,7 @@
 #include "VertexBufferLayout.h"
 
 VertexArray::VertexArray()
+	: m_RendererId(0)
 {
 	// Generate vertex array object names
 	GLCall(glGenVertexArrays(1, &m_RendererId));

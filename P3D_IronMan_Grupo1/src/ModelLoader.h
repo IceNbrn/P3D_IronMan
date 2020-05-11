@@ -15,7 +15,7 @@ public:
 	std::vector<glm::vec3>& GetNormals();
 	
 private:
-	std::string m_FilePath;
+	std::string m_FilePath;	
 	std::vector<glm::vec3> m_OutVertices;
 	std::vector<glm::vec2> m_OutUvs;
 	std::vector<glm::vec3> m_OutNormals;

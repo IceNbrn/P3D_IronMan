@@ -109,12 +109,13 @@ namespace scene
 
 		
 		m_VertexBuffer = std::make_unique<VertexBuffer>(&m_ModelIronMan->GetVertices()[0], m_ModelIronMan->GetVertices().size() * sizeof(glm::vec3));
+		std::unique_ptr<VertexBuffer> vbUv = std::make_unique<VertexBuffer>(&m_ModelIronMan->GetUvs()[0], m_ModelIronMan->GetUvs().size() * sizeof(glm::vec2));
+				
 		VertexBufferLayout layout;
 		layout.Push<float>(3);
-		//layout.Push<float>(2);
 
 		m_VAO->AddBuffer(*m_VertexBuffer, layout);
-		
+
 		m_IndexBuffer = std::make_unique<IndexBuffer>(indices, 36);
 
 		m_Shader = std::make_unique<Shader>("res/shaders/3dTest.vs", "res/shaders/3dTest.fs");
@@ -123,7 +124,6 @@ namespace scene
 		//m_Texture = std::make_unique<Texture>("res/textures/BoxGL.png");
 		m_Texture = std::make_unique<Texture>("res/textures/Iron_Man.tga");
 		m_Shader->SetUniform1i("u_Texture", 0);
-
 	}
 
 	Scene3D::~Scene3D()
@@ -147,7 +147,7 @@ namespace scene
 
 	void Scene3D::OnRender()
 	{
-		GLCall(glClearColor(0.116f, 0.171f, 0.242f, 1.0f));
+		GLCall(glClearColor(0.39f, 0.58f, 0.92f, 1.0f));
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
 		Renderer renderer;
@@ -162,7 +162,7 @@ namespace scene
 			m_Shader->SetUniformMat4f("u_Model", m_Model);
 			renderer.Draw(*m_VAO, *m_IndexBuffer, *m_Shader);
 		}
-
+		
 		{
 			m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f, 2.0f, 3.0f));
 			m_Shader->Bind();
@@ -171,7 +171,7 @@ namespace scene
 		}*/
 
 		{
-			m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+			m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -4.0f, 0.0f));
 			m_Shader->Bind();
 			m_Shader->SetUniformMat4f("u_Model", m_Model);
 			renderer.Draw(*m_VAO, *m_Shader, m_ModelIronMan->GetVertices().size());

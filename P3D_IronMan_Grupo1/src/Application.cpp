@@ -25,7 +25,7 @@
 #define SCR_WIDTH 1280
 #define SCR_HEIGHT 720
 
-Camera camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f));
 bool firstMouse = true;
 float lastX, lastY;
 

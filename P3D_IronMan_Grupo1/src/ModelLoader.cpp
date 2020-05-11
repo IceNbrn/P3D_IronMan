@@ -49,6 +49,7 @@ bool Model::LoadModel()
 			m_OutNormals.push_back(normal);
 		}
 	}
+	return true;
 }
 
 std::vector<glm::vec3>& Model::GetVertices()
