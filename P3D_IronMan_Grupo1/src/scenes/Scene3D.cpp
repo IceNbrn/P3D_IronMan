@@ -96,20 +96,34 @@ namespace scene
 		
 		//Vertex array object
 		m_VAO = std::make_unique<VertexArray>();
-
+		/*
 		m_VertexBuffer = std::make_unique<VertexBuffer>(positions, 24 * 5 * sizeof(float));
 		VertexBufferLayout layout;
 		layout.Push<float>(3);
-		layout.Push<float>(2);
+		layout.Push<float>(2);*/
+
+		m_ModelIronMan = std::make_unique<Model>("res/models/Iron_Man.xyz");
+		const bool result = m_ModelIronMan->LoadModel();
+		if (!result)
+			std::cout << "[Model]: Can't load the model!" << std::endl;
+
+		
+		m_VertexBuffer = std::make_unique<VertexBuffer>(&m_ModelIronMan->GetVertices()[0], m_ModelIronMan->GetVertices().size() * sizeof(glm::vec3));
+		VertexBufferLayout layout;
+		layout.Push<float>(3);
+		//layout.Push<float>(2);
 
 		m_VAO->AddBuffer(*m_VertexBuffer, layout);
+		
 		m_IndexBuffer = std::make_unique<IndexBuffer>(indices, 36);
 
 		m_Shader = std::make_unique<Shader>("res/shaders/3dTest.vs", "res/shaders/3dTest.fs");
 		m_Shader->Bind();
 
-		m_Texture = std::make_unique<Texture>("res/textures/BoxGL.png");
+		//m_Texture = std::make_unique<Texture>("res/textures/BoxGL.png");
+		m_Texture = std::make_unique<Texture>("res/textures/Iron_Man.tga");
 		m_Shader->SetUniform1i("u_Texture", 0);
+
 	}
 
 	Scene3D::~Scene3D()
@@ -141,7 +155,7 @@ namespace scene
 		
 		m_Shader->SetUniformMat4f("u_Projection", m_Proj);
 		m_Shader->SetUniformMat4f("u_View", m_View);
-		
+		/*
 		{
 			m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 			m_Shader->Bind();
@@ -154,7 +168,14 @@ namespace scene
 			m_Shader->Bind();
 			m_Shader->SetUniformMat4f("u_Model", m_Model);
 			renderer.Draw(*m_VAO, *m_IndexBuffer, *m_Shader);
-		} 
+		}*/
+
+		{
+			m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+			m_Shader->Bind();
+			m_Shader->SetUniformMat4f("u_Model", m_Model);
+			renderer.Draw(*m_VAO, *m_Shader, m_ModelIronMan->GetVertices().size());
+		}
 		
 	}
 

@@ -35,6 +35,6 @@ void Renderer::Draw(const VertexArray& va, const Shader& shader, const int verti
 {
 	shader.Bind();
 	va.Bind();
-
+	//GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
 	GLCall(glDrawArrays(GL_TRIANGLES, 0, vertices));
 }
