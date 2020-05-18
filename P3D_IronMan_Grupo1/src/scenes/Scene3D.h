@@ -11,7 +11,7 @@
 
 #include <GLFW/glfw3.h>
 #include "Camera.h"
-#include "ModelLoader.h"
+#include "Model.h"
 
 class Shader;
 

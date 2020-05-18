@@ -163,10 +163,8 @@ int main(void)
 				ImGui::Begin("Scenes", &isMyToolActive, ImGuiWindowFlags_MenuBar);
 				if (ImGui::BeginMenuBar())
 				{
-					if (ImGui::BeginMenu("File"))
+					if (ImGui::BeginMenu("Program"))
 					{
-						if (ImGui::MenuItem("Open..", nullptr)) { /* Do stuff */ }
-						if (ImGui::MenuItem("Save", nullptr)) { /* Do stuff */ }
 						if (ImGui::MenuItem("Close", nullptr)) { isMyToolActive = true; }
 						ImGui::EndMenu();
 					}

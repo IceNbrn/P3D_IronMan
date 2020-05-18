@@ -106,23 +106,24 @@ namespace scene
 		const bool result = m_ModelIronMan->LoadModel();
 		if (!result)
 			std::cout << "[Model]: Can't load the model!" << std::endl;
-
 		
-		m_VertexBuffer = std::make_unique<VertexBuffer>(&m_ModelIronMan->GetVertices()[0], m_ModelIronMan->GetVertices().size() * sizeof(glm::vec3));
-		std::unique_ptr<VertexBuffer> vbUv = std::make_unique<VertexBuffer>(&m_ModelIronMan->GetUvs()[0], m_ModelIronMan->GetUvs().size() * sizeof(glm::vec2));
+		m_VertexBuffer = std::make_unique<VertexBuffer>(&m_ModelIronMan->GetVertices()[0], m_ModelIronMan->GetVertices().size() * sizeof(Vertex));
 				
 		VertexBufferLayout layout;
-		layout.Push<float>(3);
+		layout.Push<float>(3); // Vertex Position
+		layout.Push<float>(2); // Vertex Texture Coordinate
+		layout.Push<float>(3); // Vertex Normal
 
 		m_VAO->AddBuffer(*m_VertexBuffer, layout);
 
-		m_IndexBuffer = std::make_unique<IndexBuffer>(indices, 36);
+		//m_IndexBuffer = std::make_unique<IndexBuffer>(indices, 36);
 
 		m_Shader = std::make_unique<Shader>("res/shaders/3dTest.vs", "res/shaders/3dTest.fs");
 		m_Shader->Bind();
 
 		//m_Texture = std::make_unique<Texture>("res/textures/BoxGL.png");
 		m_Texture = std::make_unique<Texture>("res/textures/Iron_Man.tga");
+		m_Texture->Bind(0);
 		m_Shader->SetUniform1i("u_Texture", 0);
 	}
 
@@ -151,8 +152,7 @@ namespace scene
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
 		Renderer renderer;
-		m_Texture->Bind();
-		
+				
 		m_Shader->SetUniformMat4f("u_Projection", m_Proj);
 		m_Shader->SetUniformMat4f("u_View", m_View);
 		/*
@@ -192,12 +192,6 @@ namespace scene
 		ImGui::Text("Application average %.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();
 	}
-	/*
-	void Scene3D::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
-	{
-		std::cout << "Y: " << yoffset << std::endl;
-		m_Camera.ProcessMouseScroll(yoffset);
-	}*/
 
 	void Scene3D::ProcessInput(GLFWwindow* window, float dt)
 	{
