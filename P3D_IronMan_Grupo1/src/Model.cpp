@@ -2,12 +2,12 @@
 
 #include "Model.h"
 #include <iostream>
+#include "Utils.h"
 
 
 Model::Model(const std::string& filePath)
-	: m_FilePath(filePath)
+	: m_Material(nullptr), m_FilePath(filePath)
 {
-
 }
 
 Model::~Model()
@@ -31,8 +31,24 @@ bool Model::LoadModel()
 		int result = fscanf(file, "%s", lineHeader);
 		if (result == EOF)
 			break;
+		if(strcmp(lineHeader, "mtllib") == 0)
+		{
+			char fileName[60];
+			fscanf(file, "%s", fileName);
 
-		if(strcmp(lineHeader, "v") == 0)
+			std::string materialPath;
+
+			vector<string> splitString = Utils::Split(m_FilePath, '/');
+			for (int i = 0; i < splitString.size() - 1; i++)
+			{
+				materialPath += splitString[i];
+				materialPath += "/";
+			}
+			materialPath += fileName;
+			
+			m_Material = LoadMaterial(materialPath);
+		}
+		else if(strcmp(lineHeader, "v") == 0)
 		{
 			glm::vec3 vertex;
 			fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
@@ -64,8 +80,80 @@ bool Model::LoadModel()
 	return true;
 }
 
+Material* Model::LoadMaterial(const std::string& filePath)
+{
+	
+	FILE* file = fopen(filePath.c_str(), "r");
+
+	if (file == NULL)
+	{
+		std::cout << "[MaterialLoader]: " << "Failed to open the file!" << std::endl;
+	}
+	
+	glm::vec3 ka, ks, kd;
+	float ns, ni;
+	char textureName[50];
+	std::string texturePath;
+	
+	while (true)
+	{
+		char lineHeader[128];
+		int result = fscanf(file, "%s", lineHeader);
+		if (result == EOF)
+			break;
+
+		if (strcmp(lineHeader, "Ka") == 0)
+		{
+			
+			fscanf(file, "%f %f %f\n", &ka.x, &ka.y, &ka.z);
+			//m_Material->ka = ka;
+		}
+		else if (strcmp(lineHeader, "Ks") == 0)
+		{
+			//glm::vec3 ks;
+			fscanf(file, "%f %f %f\n", &ks.x, &ks.y, &ks.z);
+			//m_Material->ks = ks;
+		}
+		else if (strcmp(lineHeader, "Kd") == 0)
+		{
+			//glm::vec3 kd;
+			fscanf(file, "%f %f %f\n", &kd.x, &kd.y, &kd.z);
+			//m_Material->kd = kd;
+		}
+		else if (strcmp(lineHeader, "Ns") == 0)
+		{
+			fscanf(file, "%f\n", &ns);
+		}
+		else if (strcmp(lineHeader, "Ni") == 0)
+		{
+			fscanf(file, "%f\n", &ni);
+		}
+		else if (strcmp(lineHeader, "map") == 0)
+		{
+			fscanf(file, "%s", textureName);
+			
+
+			vector<string> splitString = Utils::Split(m_FilePath, '/');
+			for (int i = 0; i < splitString.size() - 1; i++)
+			{
+				texturePath += splitString[i];
+				texturePath += "/";
+			}
+			texturePath += textureName;
+		}
+	}
+	Material* material = new Material(ks, ka, kd, ns, ni, texturePath);
+
+	return material;
+}
+
 std::vector<Vertex>& Model::GetVertices()
 {
 	return m_Vertices;
+}
+
+Material* Model::GetMaterial() const
+{
+	return m_Material;
 }
 

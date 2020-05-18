@@ -887,6 +887,12 @@
     <ClInclude Include="src\Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\vendor\glm\detail\func_common.inl">
@@ -1296,5 +1302,10 @@
     <None Include="res\shaders\3dTest.vs" />
     <None Include="res\shaders\3dTest.fs" />
     <None Include="res\shaders\basic.vs" />
+    <None Include="res\models\Iron_Man.mtl" />
+    <None Include="res\models\Iron_Man.xyz" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\models\Iron_Man.tga" />
   </ItemGroup>
 </Project>

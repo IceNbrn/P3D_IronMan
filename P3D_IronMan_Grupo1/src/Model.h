@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include "Texture.h"
 #include <memory>
+#include "Material.h"
 
 struct Vertex
 {
@@ -18,12 +19,14 @@ public:
 	~Model();
 
 	bool LoadModel();
-
-	void Draw();
+	Material* LoadMaterial(const std::string& filePath);
 
 	std::vector<Vertex>& GetVertices();
+
+	Material* GetMaterial() const;
 	
 private:
+	Material* m_Material;
 	std::string m_FilePath;
 	std::unique_ptr<Shader> m_Shader;
 	std::unique_ptr<Texture> m_Texture;

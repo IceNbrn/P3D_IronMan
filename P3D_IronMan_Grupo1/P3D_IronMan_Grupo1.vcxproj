@@ -185,6 +185,7 @@
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\IndexBuffer.h" />
+    <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Random.h" />
     <ClInclude Include="src\Renderer.h" />
@@ -194,6 +195,7 @@
     <ClInclude Include="src\scenes\SceneTexture.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Texture.h" />
+    <ClInclude Include="src\Utils.h" />
     <ClInclude Include="src\vendor\glm\common.hpp" />
     <ClInclude Include="src\vendor\glm\detail\compute_common.hpp" />
     <ClInclude Include="src\vendor\glm\detail\compute_vector_relational.hpp" />
@@ -452,6 +454,8 @@
     <ClInclude Include="src\VertexBufferLayout.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\models\Iron_Man.mtl" />
+    <None Include="res\models\Iron_Man.xyz" />
     <None Include="res\shaders\3dTest.fs" />
     <None Include="res\shaders\3dTest.vs" />
     <None Include="res\shaders\basic.fs" />
@@ -591,6 +595,9 @@
     <None Include="src\vendor\glm\gtx\vector_angle.inl" />
     <None Include="src\vendor\glm\gtx\vector_query.inl" />
     <None Include="src\vendor\glm\gtx\wrap.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\models\Iron_Man.tga" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

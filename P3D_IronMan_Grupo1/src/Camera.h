@@ -38,6 +38,8 @@ public:
 	void ProcessMouseScroll(float yoffset);
 
 	float* GetMovementSpeed();
+	void ResetPosition();
 private:
+	glm::vec3 m_StartPosition;
 	void UpdateCameraVectors();
 };

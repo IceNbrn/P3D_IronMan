@@ -122,7 +122,7 @@ namespace scene
 		m_Shader->Bind();
 
 		//m_Texture = std::make_unique<Texture>("res/textures/BoxGL.png");
-		m_Texture = std::make_unique<Texture>("res/textures/Iron_Man.tga");
+		m_Texture = std::make_unique<Texture>(m_ModelIronMan->GetMaterial()->GetTextureFilepath());
 		m_Texture->Bind(0);
 		m_Shader->SetUniform1i("u_Texture", 0);
 	}
@@ -138,10 +138,6 @@ namespace scene
 	void Scene3D::OnUpdate(float deltaTime)
 	{
 		ProcessInput(m_Window, deltaTime);
-
-		//m_View = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		//m_Model = glm::rotate(glm::mat4(1.0f), glm::radians(m_Rotate), glm::vec3(0.0f, 1.0f, 0.0f));
-		//m_Model = glm::rotate(m_Model, glm::radians(2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		m_View = m_Camera->GetViewMatrix();
 		m_Proj = glm::perspective(glm::radians(m_Camera->Zoom), m_AspectRatio, m_NearPlane, m_FarPlane);
 	}
@@ -181,11 +177,10 @@ namespace scene
 
 	void Scene3D::OnImGuiRender()
 	{
-		ImGui::Text("Rotation Value: %.3f", m_RotationValue);
-		ImGui::SliderFloat("Rotate", &m_Rotate, -360.0f, 360);
+		if (ImGui::Button("Reset Camera Position")) m_Camera->ResetPosition();
 		ImGui::SliderFloat("Camera Speed", m_Camera->GetMovementSpeed(), 0.0f, 15.0f);
 		ImGui::SliderFloat("Camera Zoom", &m_Camera->Zoom, 0.0f, 60.0f);
-		
+				
 		ImGui::SetNextWindowSize(ImVec2(0, 0), ImGuiCond_FirstUseEver);
 		ImGui::Begin("Stats");
 		ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
@@ -205,6 +200,8 @@ namespace scene
 			m_Camera->ProcessKeyboard(LEFT, dt);
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 			m_Camera->ProcessKeyboard(RIGHT, dt);
+		if (glfwGetKey(window, GLFW_KEY_R))
+			m_Camera->ResetPosition();
 	}
 
 }

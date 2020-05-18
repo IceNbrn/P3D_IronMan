@@ -10,6 +10,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch): Front(
 	WorldUp = up;
 	Yaw = yaw;
 	Pitch = pitch;
+    m_StartPosition = position;
 	UpdateCameraVectors();
 }
 
@@ -64,6 +65,11 @@ void Camera::ProcessMouseScroll(float yoffset)
 float* Camera::GetMovementSpeed()
 {
 	return &MovementSpeed;
+}
+
+void Camera::ResetPosition()
+{
+    Position = m_StartPosition;
 }
 
 void Camera::UpdateCameraVectors()
