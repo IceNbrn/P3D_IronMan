@@ -2,6 +2,7 @@
 
 #include "Model.h"
 #include <iostream>
+#include <fstream>
 #include "Utils.h"
 
 
@@ -16,56 +17,53 @@ Model::~Model()
 }
 
 bool Model::LoadModel()
-{		
-	FILE* file = fopen(m_FilePath.c_str(), "r");
+{
+	std::ifstream stream;
+	std::string line;
 
-	if (file == NULL)
-	{
-		std::cout << "[ModelLoader]: " << "Failed to open the file!" << std::endl;
-		return false;
-	}
+	stream.open(m_FilePath, std::ifstream::in);
 
-	while(true)
+	if (stream.is_open())
 	{
-		char lineHeader[128];
-		int result = fscanf(file, "%s", lineHeader);
-		if (result == EOF)
-			break;
-		if(strcmp(lineHeader, "mtllib") == 0)
+		stream.seekg(7);
+		stream >> line;
+		std::string materialPath;
+
+		vector<string> splitString = Utils::Split(m_FilePath, '/');
+		for (int i = 0; i < splitString.size() - 1; i++)
 		{
-			char fileName[60];
-			fscanf(file, "%s", fileName);
+			materialPath += splitString[i];
+			materialPath += "/";
+		}
+		materialPath += line;
 
-			std::string materialPath;
-
-			vector<string> splitString = Utils::Split(m_FilePath, '/');
-			for (int i = 0; i < splitString.size() - 1; i++)
+		m_Material = LoadMaterial(materialPath);
+		while (getline(stream, line))
+		{
+			stream >> line;
+			if (line == "v")
 			{
-				materialPath += splitString[i];
-				materialPath += "/";
+				glm::vec3 vertex;
+				stream >> vertex.x >> vertex.y >> vertex.z;
+				m_OutPositions.push_back(vertex);
 			}
-			materialPath += fileName;
-			
-			m_Material = LoadMaterial(materialPath);
+			else if (line == "vt")
+			{
+				glm::vec2 uv;
+				stream >> uv.x >> uv.y;
+				m_OutUvs.push_back(uv);
+			}
+			else if (line == "vn")
+			{
+				glm::vec3 normal;
+				stream >> normal.x >> normal.y >> normal.z;
+				m_OutNormals.push_back(normal);
+			}
 		}
-		else if(strcmp(lineHeader, "v") == 0)
-		{
-			glm::vec3 vertex;
-			fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
-			m_OutPositions.push_back(vertex);
-		}
-		else if(strcmp(lineHeader, "vt") == 0)
-		{
-			glm::vec2 uv;
-			fscanf(file, "%f %f\n", &uv.x, &uv.y);
-			m_OutUvs.push_back(uv);
-		}
-		else if(strcmp(lineHeader, "vn") == 0)
-		{
-			glm::vec3 normal;
-			fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
-			m_OutNormals.push_back(normal);
-		}
+	}
+	else 
+	{
+		std::cout << "[ModelLoader]: " << "Failed to open the file " << m_FilePath << std::endl;
 	}
 
 	m_Vertices.resize(m_OutPositions.size());
@@ -82,65 +80,58 @@ bool Model::LoadModel()
 
 Material* Model::LoadMaterial(const std::string& filePath)
 {
-	
-	FILE* file = fopen(filePath.c_str(), "r");
-
-	if (file == NULL)
-	{
-		std::cout << "[MaterialLoader]: " << "Failed to open the file!" << std::endl;
-	}
-	
 	glm::vec3 ka, ks, kd;
 	float ns, ni;
 	char textureName[50];
 	std::string texturePath;
 	
-	while (true)
+	std::ifstream stream;
+	std::string line;
+
+	stream.open(filePath, std::ifstream::in);
+
+	if (stream.is_open())
 	{
-		char lineHeader[128];
-		int result = fscanf(file, "%s", lineHeader);
-		if (result == EOF)
-			break;
-
-		if (strcmp(lineHeader, "Ka") == 0)
+		stream >> line;
+		while (getline(stream, line))
 		{
-			
-			fscanf(file, "%f %f %f\n", &ka.x, &ka.y, &ka.z);
-			//m_Material->ka = ka;
-		}
-		else if (strcmp(lineHeader, "Ks") == 0)
-		{
-			//glm::vec3 ks;
-			fscanf(file, "%f %f %f\n", &ks.x, &ks.y, &ks.z);
-			//m_Material->ks = ks;
-		}
-		else if (strcmp(lineHeader, "Kd") == 0)
-		{
-			//glm::vec3 kd;
-			fscanf(file, "%f %f %f\n", &kd.x, &kd.y, &kd.z);
-			//m_Material->kd = kd;
-		}
-		else if (strcmp(lineHeader, "Ns") == 0)
-		{
-			fscanf(file, "%f\n", &ns);
-		}
-		else if (strcmp(lineHeader, "Ni") == 0)
-		{
-			fscanf(file, "%f\n", &ni);
-		}
-		else if (strcmp(lineHeader, "map") == 0)
-		{
-			fscanf(file, "%s", textureName);
-			
-
-			vector<string> splitString = Utils::Split(m_FilePath, '/');
-			for (int i = 0; i < splitString.size() - 1; i++)
+			stream >> line;
+			if (line == "Ka")
 			{
-				texturePath += splitString[i];
-				texturePath += "/";
+				stream >> ka.x >> ka.y >> ka.z;
 			}
-			texturePath += textureName;
+			else if (line == "Ks")
+			{
+				stream >> ks.x >> ks.y >> ks.z;
+			}
+			else if (line == "Kd")
+			{
+				stream >> kd.x >> kd.y >> kd.z;
+			}
+			else if (line == "Ns")
+			{
+				stream >> ns;
+			}
+			else if (line == "Ni")
+			{
+				stream >> ni;
+			}
+			else if (line == "map")
+			{
+				stream >> textureName;
+				vector<string> splitString = Utils::Split(m_FilePath, '/');
+				for (int i = 0; i < splitString.size() - 1; i++)
+				{
+					texturePath += splitString[i];
+					texturePath += "/";
+				}
+				texturePath += textureName;
+			}
 		}
+	}
+	else
+	{
+		std::cout << "[ModelLoader-Texture]: " << "Failed to open the file " << filePath << std::endl;
 	}
 	Material* material = new Material(ks, ka, kd, ns, ni, texturePath);
 

@@ -186,6 +186,14 @@ namespace scene
 		ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 		ImGui::Text("Application average %.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();
+		
+		ImGui::SetNextWindowSize(ImVec2(0, 50), ImGuiCond_FirstUseEver);
+		ImGui::Begin("Help");
+		ImGui::Text("Tecla 1: Lock Cursor");
+		ImGui::Text("Tecla 2: Unlock Cursor");
+		ImGui::Text("WASD: Para mover a camara");
+		ImGui::Text("ScrollWheel: Zoom In e Zoom Out");
+		ImGui::End();
 	}
 
 	void Scene3D::ProcessInput(GLFWwindow* window, float dt)
