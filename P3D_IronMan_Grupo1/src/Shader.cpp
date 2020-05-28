@@ -4,6 +4,7 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
+#include "glm/gtc/type_ptr.hpp"
 
 Shader::Shader(const std::string& filePath)
 	: m_FilePath(filePath), m_RendererId(0)
@@ -45,9 +46,14 @@ void Shader::SetUniform1f(const std::string& name, float value)
 	GLCall(glUniform1f(GetUniformLocation(name), value));
 }
 
-void Shader::SetUniformMat3f(const std::string& name, const glm::vec3 matrix)
+void Shader::SetUniformVec3f(const std::string& name, const glm::vec3 vec)
 {
-	GLCall(glUniformMatrix3fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0]));
+	GLCall(glUniform3fv(GetUniformLocation(name), 1, glm::value_ptr(vec)));
+}
+
+void Shader::SetUniformMat3f(const std::string& name, const glm::mat3 matrix)
+{
+	GLCall(glUniformMatrix3fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix)));
 }
 
 void Shader::SetUniformMat3fv(const std::string& name, const GLfloat* value)
@@ -55,13 +61,12 @@ void Shader::SetUniformMat3fv(const std::string& name, const GLfloat* value)
 	GLCall(glUniformMatrix3fv(GetUniformLocation(name), 1, GL_FALSE, value));
 }
 
-
 void Shader::SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3)
 {
 	GLCall(glUniform4f(GetUniformLocation(name), v0, v1, v2, v3));
 }
 
-void Shader::SetUniformMat4f(const std::string& name, const glm::mat4 matrix)
+void Shader::SetUniformMat4f(const std::string name, const glm::mat4 matrix)
 {
 	GLCall(glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]))
 }
@@ -174,7 +179,7 @@ GLint Shader::GetUniformLocation(const std::string& name) const
 	GLCall(location = glGetUniformLocation(m_RendererId, name.c_str()));
 	if(location == -1)
 		std::cout << "[Shader] : " << "(Warning) Uniform '" << name << "' doesn't exist!" << std::endl;
-
+	
 	m_UniformLocationCache[name] = location;
 
 	return location;

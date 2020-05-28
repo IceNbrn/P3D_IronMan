@@ -142,6 +142,7 @@ namespace scene
 		ProcessInput(m_Window, deltaTime);
 		m_View = m_Camera->GetViewMatrix();
 		m_Proj = glm::perspective(glm::radians(m_Camera->Zoom), m_AspectRatio, m_NearPlane, m_FarPlane);
+
 	}
 
 	void Scene3D::OnRender()
@@ -150,38 +151,29 @@ namespace scene
 		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
 		Renderer renderer;
-				
 		m_Shader->SetUniformMat4f("u_Projection", m_Proj);
 		m_Shader->SetUniformMat4f("u_View", m_View);
-		/*
-		{
-			m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-			m_Shader->Bind();
-			m_Shader->SetUniformMat4f("u_Model", m_Model);
-			renderer.Draw(*m_VAO, *m_IndexBuffer, *m_Shader);
-		}
-		
-		{
-			m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f, 2.0f, 3.0f));
-			m_Shader->Bind();
-			m_Shader->SetUniformMat4f("u_Model", m_Model);
-			renderer.Draw(*m_VAO, *m_IndexBuffer, *m_Shader);
-		}*/
+		//m_Shader->SetUniform1f("material", 1.0f);
 
 		{
 			m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -4.0f, 0.0f));
 			m_Shader->Bind();
+
 			m_Shader->SetUniformMat4f("u_Model", m_Model);
 
-			glm::mat4 ModelView = m_View * m_Model;
-			glm::mat3 NormalMatrix;
-			NormalMatrix = glm::inverseTranspose(glm::mat3(ModelView));
-			m_Shader->SetUniformMat4f("ModelView", ModelView);
-			m_Shader->SetUniformMat3fv("NormalMatrix", glm::value_ptr(NormalMatrix));
+			
+			glm::mat4 modelView = m_View * m_Model;
+			m_Shader->SetUniformMat4f("u_ModelView", modelView);
+			
+			
+			glm::mat3 normalMatrix;
+			normalMatrix = glm::inverseTranspose(glm::mat3(modelView));
+			
+			m_Shader->SetUniformMat3f("u_NormalMatrix", normalMatrix);
 
-			//Lighting work in progress
-			m_Shader->SetUniformMat3f("ambientLight.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
-
+			// Lighting work in progress
+			m_Shader->SetUniformVec3f("u_AmbientLight.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
+			
 
 			renderer.Draw(*m_VAO, *m_Shader, m_ModelIronMan->GetVertices().size());
 		}

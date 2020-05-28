@@ -9,12 +9,19 @@ in vec2 v_TexCoord;
 uniform vec4 u_Color;
 uniform sampler2D u_Texture;
 
-// Estrutura da fonte de luz ambiente global
 struct AmbientLight {
-	vec3 ambient;	// Componente de luz ambiente global
+	vec3 ambient;
 };
 
-uniform AmbientLight ambientLight; // Fonte de luz ambiente global
+struct Material{
+	vec3 emissive;
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+	float shininess;
+};
+
+uniform AmbientLight u_AmbientLight;
 
 void main()
 {
