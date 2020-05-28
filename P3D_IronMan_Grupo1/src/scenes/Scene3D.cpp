@@ -5,6 +5,8 @@
 #include <glm/gtx/string_cast.hpp>
 #include "float.h"
 #include <math.h>
+#include <glm\gtc\matrix_inverse.hpp> // glm::inverseTranspose()
+#include <vendor\glm\gtc\type_ptr.hpp>
 
 namespace scene
 {
@@ -170,6 +172,17 @@ namespace scene
 			m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -4.0f, 0.0f));
 			m_Shader->Bind();
 			m_Shader->SetUniformMat4f("u_Model", m_Model);
+
+			glm::mat4 ModelView = m_View * m_Model;
+			glm::mat3 NormalMatrix;
+			NormalMatrix = glm::inverseTranspose(glm::mat3(ModelView));
+			m_Shader->SetUniformMat4f("ModelView", ModelView);
+			m_Shader->SetUniformMat3fv("NormalMatrix", glm::value_ptr(NormalMatrix));
+
+			//Lighting work in progress
+			m_Shader->SetUniformMat3f("ambientLight.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
+
+
 			renderer.Draw(*m_VAO, *m_Shader, m_ModelIronMan->GetVertices().size());
 		}
 		
