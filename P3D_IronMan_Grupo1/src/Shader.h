@@ -39,7 +39,7 @@ public:
 	void SetUniformMat3f(const std::string& name, const glm::mat3 matrix);
 	void SetUniformMat3fv(const std::string& name, const GLfloat* value);
 	void SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3);
-	void SetUniformMat4f(const std::string name, const glm::mat4 matrix);
+	void SetUniformMat4f(const std::string& name, const glm::mat4 matrix);
 
 private:
 	ShaderProgramSource ParseShader(const std::string& filePath);
