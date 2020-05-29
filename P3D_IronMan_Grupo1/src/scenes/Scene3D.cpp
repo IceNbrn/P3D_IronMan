@@ -156,7 +156,7 @@ namespace scene
 		//m_Shader->SetUniform1f("material", 1.0f);
 
 		{
-			m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -4.0f, 0.0f));
+			m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 			m_Shader->Bind();
 
 			m_Shader->SetUniformMat4f("u_Model", m_Model);
@@ -172,9 +172,46 @@ namespace scene
 			m_Shader->SetUniformMat3f("u_NormalMatrix", normalMatrix);
 
 			// Lighting work in progress
-			m_Shader->SetUniformVec3f("u_AmbientLight.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
+			m_Shader->SetUniformVec3f("ambientLight.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
 			
+			// Fonte de luz direcional
+			m_Shader->SetUniformVec3f("directionalLight.direction", glm::vec3(1.0, 0.0, 0.0));
+			m_Shader->SetUniformVec3f("directionalLight.ambient", glm::vec3(0.2, 0.2, 0.2));
+			m_Shader->SetUniformVec3f("directionalLight.diffuse", glm::vec3(1.0, 1.0, 1.0));
+			m_Shader->SetUniformVec3f("directionalLight.specular", glm::vec3(1.0, 1.0, 1.0));
 
+			// Fonte de luz pontual
+			m_Shader->SetUniformVec3f("pointLight.position", glm::vec3(0.0, 0.0, 5.0));
+			m_Shader->SetUniformVec3f("pointLight.ambient", glm::vec3(0.1, 0.1, 0.1));
+			m_Shader->SetUniformVec3f("pointLight.diffuse", glm::vec3(1.0, 1.0, 1.0));
+			m_Shader->SetUniformVec3f("pointLight.specular", glm::vec3(1.0, 1.0, 1.0));
+			m_Shader->SetUniform1f("pointLight.constant",1.0f);
+			m_Shader->SetUniform1f("pointLight.linear", 0.06f);
+			m_Shader->SetUniform1f("pointLight.quadratic",0.02f);
+
+
+			// Fonte de luz cónica
+			/*m_Shader->SetUniformVec3f("spotLight.position", glm::vec3(0.0, 0.0, 5.0));
+			m_Shader->SetUniformVec3f("spotLight.ambient", glm::vec3(0.1, 0.1, 0.1));
+			m_Shader->SetUniformVec3f("spotLight.diffuse", glm::vec3(1.0, 1.0, 1.0));
+			m_Shader->SetUniformVec3f("spotLight.specular", glm::vec3(1.0, 1.0, 1.0));
+			m_Shader->SetUniform1f("spotLight.constant", 1.0f);
+			m_Shader->SetUniform1f("spotLight.linear", 0.06f);
+			m_Shader->SetUniform1f("spotLight.quadratic", 0.02f);
+			m_Shader->SetUniform1f("spotLight.spotCutoff", 1.0f);
+			m_Shader->SetUniform1f("spotLight.spotExponent", 0.5f);
+			m_Shader->SetUniformVec3f("spotLight.spotDirection", glm::vec3(1.0, 1.0, 1.0));*/
+
+
+			//Materiais
+			m_Shader->SetUniformVec3f("material.emissive", glm::vec3(0.0, 0.0, 0.0));
+			m_Shader->SetUniformVec3f("material.ambient", m_ModelIronMan->GetMaterial()->ka);
+			m_Shader->SetUniformVec3f("material.diffuse", m_ModelIronMan->GetMaterial()->kd);
+			m_Shader->SetUniformVec3f("material.specular", m_ModelIronMan->GetMaterial()->ks);
+			m_Shader->SetUniform1f("material.shininess", m_ModelIronMan->GetMaterial()->ns);
+
+
+			//Renderer
 			renderer.Draw(*m_VAO, *m_Shader, m_ModelIronMan->GetVertices().size());
 		}
 		
