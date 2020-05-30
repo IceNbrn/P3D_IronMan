@@ -82,7 +82,7 @@ vec4 calcSpotLight(SpotLight light);
 uniform	int	bAmbient;
 uniform int bDirectional;
 uniform int bPoint;
-//uniform int bSpot;
+uniform int bSpot;
 
 void main()
 {
@@ -112,7 +112,10 @@ void main()
 	light[2] = vec4(0.0);
 
 	// Contribuição da fonte de luz cónica
+	if (bSpot == 1)
 	light[3] = calcSpotLight(spotLight);
+	else
+	light[3] = vec4(0.0);
 
 	// Cálculo da cor final do fragmento.
 	// Com CubeMap

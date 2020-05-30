@@ -178,12 +178,6 @@ namespace scene
 			
 			m_Shader->SetUniformMat3f("u_NormalMatrix", normalMatrix);
 
-			//Desligar ou ligar luzes
-			m_Shader->SetUniform1i("bAmbient", FALSE);
-			m_Shader->SetUniform1i("bDirectional", FALSE);
-			m_Shader->SetUniform1i("bPoint", FALSE);
-			//m_Shader->SetUniform1i("bSpot", FALSE);
-
 			//Fonte de Luz ambiente
 			m_Shader->SetUniformVec3f("ambientLight.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
 			
