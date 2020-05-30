@@ -1,4 +1,6 @@
 #define _USE_MATH_DEFINES
+#define TRUE 1
+#define FALSE 0
 
 #include "Scene3D.h"
 #include "imgui/imgui.h"
@@ -20,6 +22,11 @@ namespace scene
 		m_NearPlane = 0.1f;
 		m_FarPlane = 100.0f;
 		m_AspectRatio = (float)width / (float)height;
+
+		m_Ambient = false;
+		m_Directional = false;
+		m_Point = false;
+		m_Spot = false;
 
 		m_Camera = camera;
 		
@@ -171,7 +178,13 @@ namespace scene
 			
 			m_Shader->SetUniformMat3f("u_NormalMatrix", normalMatrix);
 
-			// Lighting work in progress
+			//Desligar ou ligar luzes
+			m_Shader->SetUniform1i("bAmbient", FALSE);
+			m_Shader->SetUniform1i("bDirectional", FALSE);
+			m_Shader->SetUniform1i("bPoint", FALSE);
+			//m_Shader->SetUniform1i("bSpot", FALSE);
+
+			//Fonte de Luz ambiente
 			m_Shader->SetUniformVec3f("ambientLight.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
 			
 			// Fonte de luz direcional
@@ -191,17 +204,15 @@ namespace scene
 
 
 			// Fonte de luz cónica
-			/*m_Shader->SetUniformVec3f("spotLight.position", glm::vec3(0.0, 0.0, 5.0));
+			m_Shader->SetUniformVec3f("spotLight.position", m_CameraPos);
 			m_Shader->SetUniformVec3f("spotLight.ambient", glm::vec3(0.1, 0.1, 0.1));
 			m_Shader->SetUniformVec3f("spotLight.diffuse", glm::vec3(1.0, 1.0, 1.0));
 			m_Shader->SetUniformVec3f("spotLight.specular", glm::vec3(1.0, 1.0, 1.0));
 			m_Shader->SetUniform1f("spotLight.constant", 1.0f);
 			m_Shader->SetUniform1f("spotLight.linear", 0.06f);
 			m_Shader->SetUniform1f("spotLight.quadratic", 0.02f);
-			m_Shader->SetUniform1f("spotLight.spotCutoff", 1.0f);
-			m_Shader->SetUniform1f("spotLight.spotExponent", 0.5f);
-			m_Shader->SetUniformVec3f("spotLight.spotDirection", glm::vec3(1.0, 1.0, 1.0));*/
-
+			m_Shader->SetUniform1f("spotLight.spotCutoff", glm::cos(glm::radians(12.5f)));
+			m_Shader->SetUniformVec3f("spotLight.spotDirection", m_CameraFront);
 
 			//Materiais
 			m_Shader->SetUniformVec3f("material.emissive", glm::vec3(0.0, 0.0, 0.0));
@@ -252,6 +263,47 @@ namespace scene
 			m_Camera->ProcessKeyboard(RIGHT, dt);
 		if (glfwGetKey(window, GLFW_KEY_R))
 			m_Camera->ResetPosition();
+
+		//Ligar ou desligar luzes
+		//Luz Ambiente
+		if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && m_Ambient == false) {
+			m_Shader->SetUniform1i("bAmbient", TRUE);
+			m_Ambient = true;
+		}
+		else {
+			m_Shader->SetUniform1i("bAmbient", FALSE);
+			m_Ambient = false;
+		}
+		
+		//Luz diretional
+		if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && m_Directional == false) {
+			m_Shader->SetUniform1i("bDirectional", TRUE);
+			m_Directional = true;
+		}
+		else {
+			m_Shader->SetUniform1i("bDirectional", FALSE);
+			m_Directional = false;
+		}
+
+		//Luz Pontual
+		if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && m_Point == false) {
+			m_Shader->SetUniform1i("bPoint", TRUE);
+			m_Point = true;
+		}
+		else {
+			m_Shader->SetUniform1i("bPoint", FALSE);
+			m_Point = false;
+		}
+
+		//Luz Cónica
+		if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS && m_Spot == false) {
+			m_Shader->SetUniform1i("bSpot", TRUE);
+			m_Spot = true;
+		}
+		else {
+			m_Shader->SetUniform1i("bSpot", FALSE);
+			m_Spot = false;
+		}
 	}
 
 }

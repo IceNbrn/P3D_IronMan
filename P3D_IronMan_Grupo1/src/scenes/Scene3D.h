@@ -47,6 +47,11 @@ namespace scene
 		float m_FarPlane;
 		float m_AspectRatio;
 
+		bool m_Ambient;
+		bool m_Directional;
+		bool m_Point;
+		bool m_Spot; 
+		
 		glm::vec3 m_CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 		glm::vec3 m_CameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 		glm::vec3 m_CameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
