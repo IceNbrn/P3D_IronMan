@@ -236,8 +236,12 @@ namespace scene
 		
 		ImGui::SetNextWindowSize(ImVec2(0, 50), ImGuiCond_FirstUseEver);
 		ImGui::Begin("Help");
-		ImGui::Text("Tecla 1: Lock Cursor");
-		ImGui::Text("Tecla 2: Unlock Cursor");
+		ImGui::Text("Tecla 1: Luz Ambiente");
+		ImGui::Text("Tecla 2: Luz Direcional");
+		ImGui::Text("Tecla 3: Luz Pontual");
+		ImGui::Text("Tecla 4: Luz Conica");
+		ImGui::Text("Tecla 8: Lock Cursor");
+		ImGui::Text("Tecla 9: Unlock Cursor");
 		ImGui::Text("WASD: Para mover a camara");
 		ImGui::Text("ScrollWheel: Zoom In e Zoom Out");
 		ImGui::End();
@@ -260,41 +264,51 @@ namespace scene
 
 		//Ligar ou desligar luzes
 		//Luz Ambiente
-		if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && m_Ambient == false) {
+		if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && m_Ambient == false)
+		{
 			m_Shader->SetUniform1i("bAmbient", TRUE);
 			m_Ambient = true;
 		}
-		else {
+		else if(glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && m_Ambient == true)
+		{
 			m_Shader->SetUniform1i("bAmbient", FALSE);
 			m_Ambient = false;
 		}
 		
-		//Luz diretional
-		if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && m_Directional == false) {
+		
+		//Luz diretional	
+		if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && m_Directional == false)
+		{
 			m_Shader->SetUniform1i("bDirectional", TRUE);
 			m_Directional = true;
-		}
-		else {
+		}			
+		else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && m_Directional == true)
+		{
 			m_Shader->SetUniform1i("bDirectional", FALSE);
 			m_Directional = false;
 		}
+		
 
 		//Luz Pontual
-		if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && m_Point == false) {
+		if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && m_Point == false)
+		{
 			m_Shader->SetUniform1i("bPoint", TRUE);
 			m_Point = true;
 		}
-		else {
+		else if(glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && m_Point == true)
+		{
 			m_Shader->SetUniform1i("bPoint", FALSE);
 			m_Point = false;
 		}
 
 		//Luz Cónica
-		if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS && m_Spot == false) {
+		if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS && m_Spot == false)
+		{
 			m_Shader->SetUniform1i("bSpot", TRUE);
 			m_Spot = true;
 		}
-		else {
+		else if(glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS && m_Spot == true)
+		{
 			m_Shader->SetUniform1i("bSpot", FALSE);
 			m_Spot = false;
 		}

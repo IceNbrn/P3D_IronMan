@@ -40,9 +40,9 @@ void ProcessInput(GLFWwindow* window, bool* isMyToolActive)
         glfwTerminate();
         exit(0);
 	}
-	if(glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	if(glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS)
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS)
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
