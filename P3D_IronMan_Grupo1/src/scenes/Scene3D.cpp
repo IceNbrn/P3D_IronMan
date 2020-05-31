@@ -7,7 +7,7 @@
 #include <glm/gtx/string_cast.hpp>
 #include "float.h"
 #include <math.h>
-#include <glm\gtc\matrix_inverse.hpp> // glm::inverseTranspose()
+#include <glm\gtc\matrix_inverse.hpp>
 #include <vendor\glm\gtc\type_ptr.hpp>
 
 namespace scene
@@ -35,9 +35,6 @@ namespace scene
 		m_Proj = glm::mat4(1.0f);
 
 		m_Model = glm::rotate(m_Model, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		//m_View = glm::translate(m_View, glm::vec3(0.0f, 0.0f, -3.0f));
-		//m_View = glm::lookAt(m_CameraPos, m_CameraPos + m_CameraFront, m_CameraUp);
-		//m_Proj = glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
 		m_Proj = glm::perspective(glm::radians(m_Camera->Zoom), m_AspectRatio, m_NearPlane, m_FarPlane);
 		m_View = m_Camera->GetViewMatrix();
 		m_CameraSpeed = 2.5f;
@@ -106,19 +103,14 @@ namespace scene
 		
 		//Vertex array object
 		m_VAO = std::make_unique<VertexArray>();
-		/*
-		m_VertexBuffer = std::make_unique<VertexBuffer>(positions, 24 * 5 * sizeof(float));
-		VertexBufferLayout layout;
-		layout.Push<float>(3);
-		layout.Push<float>(2);*/
-
+		
 		m_ModelIronMan = std::make_unique<Model>("res/models/Iron_Man.xyz");
 		const bool result = m_ModelIronMan->LoadModel();
 		if (!result)
 			std::cout << "[Model]: Can't load the model!" << std::endl;
 		
 		m_VertexBuffer = std::make_unique<VertexBuffer>(&m_ModelIronMan->GetVertices()[0], m_ModelIronMan->GetVertices().size() * sizeof(Vertex));
-				
+		
 		VertexBufferLayout layout;
 		layout.Push<float>(3); // Vertex Position
 		layout.Push<float>(2); // Vertex Texture Coordinate
@@ -126,12 +118,9 @@ namespace scene
 
 		m_VAO->AddBuffer(*m_VertexBuffer, layout);
 
-		//m_IndexBuffer = std::make_unique<IndexBuffer>(indices, 36);
-
 		m_Shader = std::make_unique<Shader>("res/shaders/3dTest.vs", "res/shaders/3dTest.fs");
 		m_Shader->Bind();
 
-		//m_Texture = std::make_unique<Texture>("res/textures/BoxGL.png");
 		m_Texture = std::make_unique<Texture>(m_ModelIronMan->GetMaterial()->GetTextureFilepath());
 		m_Texture->Bind(0);
 		m_Shader->SetUniform1i("u_Texture", 0);

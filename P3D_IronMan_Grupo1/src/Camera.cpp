@@ -54,6 +54,7 @@ void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constr
 
 void Camera::ProcessMouseScroll(float yoffset)
 {
+	// Zoom Camera
     if(Zoom > 1.0f && Zoom <= 60.0f)
         Zoom -= yoffset;
     if(Zoom <= 1.0f)

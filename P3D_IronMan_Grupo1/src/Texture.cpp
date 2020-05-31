@@ -36,6 +36,7 @@ Texture::~Texture()
 void Texture::Bind(unsigned slot) const
 {
 	// Select active texture unit
+	// This would help us if we wanted to use more than 1 texture
 	GLCall(glActiveTexture(GL_TEXTURE0 + slot));
 	GLCall(glBindTexture(GL_TEXTURE_2D, m_RendererId));
 }

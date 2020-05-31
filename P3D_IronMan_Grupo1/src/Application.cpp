@@ -53,6 +53,8 @@ void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 
 void MouseCallback(GLFWwindow* window, double xpos, double ypos)
 {
+	// firstMouse helps us to make a smooth transition, when we do not have the application window on focus.
+	// It detects if is the first time focusing the window.
 	if (firstMouse)
 	{
 		lastX = xpos;
@@ -61,7 +63,7 @@ void MouseCallback(GLFWwindow* window, double xpos, double ypos)
 	}
 
 	float xoffset = xpos - lastX;
-	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+	float yoffset = lastY - ypos; // revert since y-coordinates go from bottom to top
 
 	lastX = xpos;
 	lastY = ypos;
