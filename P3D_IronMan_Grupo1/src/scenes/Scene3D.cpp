@@ -43,6 +43,7 @@ namespace scene
 		m_CameraSpeed = 2.5f;
 		
 		m_Radius = 10.0f;
+		m_AmbientLight = glm::vec3(1.0f, 1.0f, 1.0f);
 		
 
 		float positions[] = {
@@ -134,6 +135,8 @@ namespace scene
 		m_Texture = std::make_unique<Texture>(m_ModelIronMan->GetMaterial()->GetTextureFilepath());
 		m_Texture->Bind(0);
 		m_Shader->SetUniform1i("u_Texture", 0);
+		m_DeformModel = false;
+		
 	}
 
 	Scene3D::~Scene3D()
@@ -149,7 +152,8 @@ namespace scene
 		ProcessInput(m_Window, deltaTime);
 		m_View = m_Camera->GetViewMatrix();
 		m_Proj = glm::perspective(glm::radians(m_Camera->Zoom), m_AspectRatio, m_NearPlane, m_FarPlane);
-
+		m_Shader->SetUniform1f("u_Time", deltaTime);
+		m_Shader->SetUniform1i("u_bDeformActive", m_DeformModel);
 	}
 
 	void Scene3D::OnRender()
@@ -167,11 +171,9 @@ namespace scene
 			m_Shader->Bind();
 
 			m_Shader->SetUniformMat4f("u_Model", m_Model);
-
 			
 			glm::mat4 modelView = m_View * m_Model;
 			m_Shader->SetUniformMat4f("u_ModelView", modelView);
-			
 			
 			glm::mat3 normalMatrix;
 			normalMatrix = glm::inverseTranspose(glm::mat3(modelView));
@@ -179,7 +181,7 @@ namespace scene
 			m_Shader->SetUniformMat3f("u_NormalMatrix", normalMatrix);
 
 			//Fonte de Luz ambiente
-			m_Shader->SetUniformVec3f("ambientLight.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
+			m_Shader->SetUniformVec3f("ambientLight.ambient", m_AmbientLight);
 			
 			// Fonte de luz direcional
 			m_Shader->SetUniformVec3f("directionalLight.direction", glm::vec3(1.0, 0.0, 0.0));
@@ -195,7 +197,6 @@ namespace scene
 			m_Shader->SetUniform1f("pointLight.constant",1.0f);
 			m_Shader->SetUniform1f("pointLight.linear", 0.06f);
 			m_Shader->SetUniform1f("pointLight.quadratic",0.02f);
-
 
 			// Fonte de luz cónica
 			m_Shader->SetUniformVec3f("spotLight.position", m_CameraPos);
@@ -224,9 +225,11 @@ namespace scene
 
 	void Scene3D::OnImGuiRender()
 	{
+		if (ImGui::Button("Deform Model")) m_DeformModel = !m_DeformModel;
 		if (ImGui::Button("Reset Camera Position")) m_Camera->ResetPosition();
 		ImGui::SliderFloat("Camera Speed", m_Camera->GetMovementSpeed(), 0.0f, 15.0f);
 		ImGui::SliderFloat("Camera Zoom", &m_Camera->Zoom, 0.0f, 60.0f);
+		ImGui::SliderFloat3("Ambient Light Intensity", &m_AmbientLight.x, 0.0f, 10.0f);
 				
 		ImGui::SetNextWindowSize(ImVec2(0, 0), ImGuiCond_FirstUseEver);
 		ImGui::Begin("Stats");
@@ -274,7 +277,6 @@ namespace scene
 			m_Shader->SetUniform1i("bAmbient", FALSE);
 			m_Ambient = false;
 		}
-		
 		
 		//Luz diretional	
 		if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && m_Directional == false)

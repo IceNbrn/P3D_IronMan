@@ -8,6 +8,8 @@ uniform mat4 u_Model;
 uniform mat4 u_View;
 uniform mat4 u_Projection;
 uniform mat3 u_NormalMatrix;
+uniform int u_bDeformActive;
+uniform float u_Time;
 
 out vec3 vPositionEyeSpace;
 out vec3 vNormalEyeSpace;
@@ -21,5 +23,14 @@ void main()
 	vNormalEyeSpace = normalize(u_NormalMatrix * v_Normal);
 
 	v_TexCoord = texCoord;
-	gl_Position = u_Projection * u_View * u_Model * vec4(position, 1.0f);
+	if(u_bDeformActive == 1)
+	{
+		vec3 v_DeformPosition;
+		v_DeformPosition = position + (v_Normal * (cos(u_Time * 0.001f) * 0.05f));
+		gl_Position = u_Projection * u_View * u_Model * vec4(v_DeformPosition, 1.0f);
+	}
+	else
+	{
+		gl_Position = u_Projection * u_View * u_Model * vec4(position, 1.0f);
+	}
 }
